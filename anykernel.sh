@@ -1,11 +1,9 @@
-
 ### AnyKernel3 Ramdisk Mod Script
 ## osm0sis @ xda-developers
 
 ### AnyKernel setup
-# Global properties
 properties() { '
-kernel.string=CoreShift GKI Kernel for android12-5.10 devices by Diky_I
+kernel.string=CoreShift
 do.devicecheck=0
 do.modules=0
 do.systemless=1
@@ -16,26 +14,34 @@ device.name2=
 supported.versions=
 supported.patchlevels=
 supported.vendorpatchlevels=
-'; } # end properties
+'; }
 
 ### AnyKernel install
 
-## Boot shell variables
 BLOCK=boot
 IS_SLOT_DEVICE=1
 RAMDISK_COMPRESSION=auto
 PATCH_VBMETA_FLAG=auto
 
-# Import functions/variables and setup patching - see for reference (DO NOT REMOVE)
 . tools/ak3-core.sh
 
-## Start boot install
+split_boot
 
-split_boot # Use split_boot to skip ramdisk unpack
+# ===== Detect Features =====
+KERNEL_STR="$(grep '^kernel.string=' anykernel.sh | cut -d= -f2)"
 
-# ===== Professional UI PRINT =====
+MANAGER="$(echo "$KERNEL_STR" | cut -d- -f2)"
+
+HAS_SUSFS=0
+HAS_BBG=0
+
+echo "$KERNEL_STR" | grep -qi "susfs" && HAS_SUSFS=1
+echo "$KERNEL_STR" | grep -qi "bbg" && HAS_BBG=1
+
+# ===== Kernel Version =====
 KERNEL_VER="$(strings "${AKHOME}/Image" 2>/dev/null | grep -E -m1 'Linux version.*#' | awk '{print $3}')"
 
+# ===== UI =====
 ui_print " "
 ui_print "========================================"
 ui_print "         CoreShift GKI Kernel"
@@ -45,15 +51,29 @@ ui_print " Maintainer  : Diky_I"
 ui_print " Kernel Ver  : ${KERNEL_VER}"
 ui_print " Slot Device : A/B"
 ui_print "----------------------------------------"
+
+ui_print " Manager : ${MANAGER}"
+
+if [ "$HAS_SUSFS" = "1" ]; then
+  ui_print " SUSFS   : Enabled"
+else
+  ui_print " SUSFS   : Disabled"
+fi
+
+if [ "$HAS_BBG" = "1" ]; then
+  ui_print " BBG     : Enabled"
+else
+  ui_print " BBG     : Disabled"
+fi
+
+ui_print "----------------------------------------"
 ui_print " Flashing boot image..."
 ui_print " "
 
-flash_boot # Skip ramdisk repack
+flash_boot
 
 ui_print " "
 ui_print "----------------------------------------"
 ui_print " Flash completed successfully."
 ui_print "========================================"
 ui_print " "
-
-## End boot install
