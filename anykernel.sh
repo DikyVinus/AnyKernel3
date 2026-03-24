@@ -31,12 +31,14 @@ split_boot
 KERNEL_STR="$(grep '^kernel.string=' anykernel.sh | cut -d= -f2)"
 
 MANAGER="$(echo "$KERNEL_STR" | cut -d- -f2)"
+FEATURES="$(echo "$KERNEL_STR" | cut -d- -f3-)"
 
 HAS_SUSFS=0
 HAS_BBG=0
 
-echo "$KERNEL_STR" | grep -qi "susfs" && HAS_SUSFS=1
-echo "$KERNEL_STR" | grep -qi "bbg" && HAS_BBG=1
+# case-insensitive detection (matches SUS / SUSFS / any variant)
+echo "$FEATURES" | grep -qi "sus" && HAS_SUSFS=1
+echo "$FEATURES" | grep -qi "bbg" && HAS_BBG=1
 
 # ===== Kernel Version =====
 KERNEL_VER="$(strings "${AKHOME}/Image" 2>/dev/null | grep -E -m1 'Linux version.*#' | awk '{print $3}')"
