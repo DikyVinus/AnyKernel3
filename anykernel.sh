@@ -1,9 +1,12 @@
 ### AnyKernel3 Ramdisk Mod Script
 ## osm0sis @ xda-developers
 
+# ===== Kernel Identity (safe for sed) =====
+KERNEL_STRING="CoreShift"
+
 ### AnyKernel setup
-properties() { '
-kernel.string=CoreShift
+properties() { "
+kernel.string=${KERNEL_STRING}
 do.devicecheck=0
 do.modules=0
 do.systemless=1
@@ -14,7 +17,7 @@ device.name2=
 supported.versions=
 supported.patchlevels=
 supported.vendorpatchlevels=
-'; }
+"; }
 
 ### AnyKernel install
 
@@ -28,7 +31,7 @@ PATCH_VBMETA_FLAG=auto
 split_boot
 
 # ===== Detect Features =====
-KERNEL_STR="$(grep '^kernel.string=' anykernel.sh | cut -d= -f2)"
+KERNEL_STR="${KERNEL_STRING}"
 
 MANAGER="$(echo "$KERNEL_STR" | cut -d- -f2)"
 FEATURES="$(echo "$KERNEL_STR" | cut -d- -f3-)"
@@ -36,7 +39,6 @@ FEATURES="$(echo "$KERNEL_STR" | cut -d- -f3-)"
 HAS_SUSFS=0
 HAS_BBG=0
 
-# case-insensitive detection (matches SUS / SUSFS / any variant)
 echo "$FEATURES" | grep -qi "sus" && HAS_SUSFS=1
 echo "$FEATURES" | grep -qi "bbg" && HAS_BBG=1
 
