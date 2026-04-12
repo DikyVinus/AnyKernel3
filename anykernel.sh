@@ -1,12 +1,9 @@
 ### AnyKernel3 Ramdisk Mod Script
 ## osm0sis @ xda-developers
 
-# ===== Kernel Identity (safe for sed) =====
-KERNEL_STRING="CoreShift"
-
 ### AnyKernel setup
 properties() { "
-kernel.string=${KERNEL_STRING}
+kernel.string=
 do.devicecheck=0
 do.modules=0
 do.systemless=1
@@ -30,20 +27,9 @@ PATCH_VBMETA_FLAG=auto
 
 split_boot
 
-# ===== Detect Features =====
-KERNEL_STR="${KERNEL_STRING}"
-
-MANAGER="$(echo "$KERNEL_STR" | cut -d- -f2)"
-FEATURES="$(echo "$KERNEL_STR" | cut -d- -f3-)"
-
-HAS_SUSFS=0
-HAS_BBG=0
-
-echo "$FEATURES" | grep -qi "sus" && HAS_SUSFS=1
-echo "$FEATURES" | grep -qi "bbg" && HAS_BBG=1
-
 # ===== Kernel Version =====
 KERNEL_VER="$(strings "${AKHOME}/Image" 2>/dev/null | grep -E -m1 'Linux version.*#' | awk '{print $3}')"
+[ -z "$KERNEL_VER" ] && KERNEL_VER="unknown"
 
 # ===== UI =====
 ui_print " "
@@ -54,22 +40,6 @@ ui_print " Android 12 | Linux 5.10 Series"
 ui_print " Maintainer  : Diky_I"
 ui_print " Kernel Ver  : ${KERNEL_VER}"
 ui_print " Slot Device : A/B"
-ui_print "----------------------------------------"
-
-ui_print " Manager : ${MANAGER}"
-
-if [ "$HAS_SUSFS" = "1" ]; then
-  ui_print " SUSFS   : Enabled"
-else
-  ui_print " SUSFS   : Disabled"
-fi
-
-if [ "$HAS_BBG" = "1" ]; then
-  ui_print " BBG     : Enabled"
-else
-  ui_print " BBG     : Disabled"
-fi
-
 ui_print "----------------------------------------"
 ui_print " Flashing boot image..."
 ui_print " "
